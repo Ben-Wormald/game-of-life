@@ -1,4 +1,5 @@
 var sleep = require('sleep');
+var read = require('read-file');
 
 main();
 
@@ -85,16 +86,38 @@ function printGrid(grid)
  */
 function readGrid(file)
 {
-    // TODO read file
+    // Read the file and convert the buffer to an array of strings for each row
+    try
+    {
+        var buffer = read.sync(file);
+        var rows = buffer.toString('utf8').split('\n');
+    }
+    catch(error)
+    {
+        console.log('Error: could not read file ' + file);
+        process.exit();
+    }
+    
+    var grid = [];
 
-    return [
-        [0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 0, 0, 0],
-        [0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0]
-    ];
+    // Loop over each row and split into strings for each cell
+    for(row = 0; row < rows.length; row++)
+    {
+        var newRow = [];
+        var rowStrings = rows[row].split('')
+
+        // For each cell string, add a boolean to the row
+        for(col = 0; col < rowStrings.length; col++)
+        {
+            newRow.push(rowStrings[col] == '1');
+        }
+
+        // Add the row to the grid, ignore if empty line
+        if(newRow.length)
+            grid.push(newRow);
+    }
+
+    return grid;
 }
 
 /**
